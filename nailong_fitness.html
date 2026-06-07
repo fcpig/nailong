@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>奶龙健身操 - 久坐放松助手</title>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+<style>
+/* ====== 主题色与字体 ====== */
+:root{
+--c1:#FFE08A;--c2:#FFB35A;--c3:#FF8C42;--c4:#FF6B35;--c5:#FF4E6E;
+--bg-main:linear-gradient(135deg,#FFD93D 0%,#FFB35A 35%,#FF8C42 70%,#FF6B35 100%);
+--bg-soft:linear-gradient(135deg,#FFE9A8 0%,#FFC58A 50%,#FFA47A 100%);
+--bg-deep:linear-gradient(135deg,#FF8C42 0%,#FF6B35 60%,#FF4E6E 100%);
+--shadow-soft:0 10px 30px rgba(255,107,53,.18);
+--shadow-pop:0 14px 40px rgba(255,107,53,.32);
+--shadow-card:0 8px 24px rgba(255,107,53,.12);
+--radius-sm:14px;--radius-md:22px;--radius-lg:32px;--radius-pill:999px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'ZCOOL KuaiLe','Ma Shan Zheng','Microsoft YaHei','PingFang SC',sans-serif;background:var(--bg-main)}
+.page{position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s}
+.page.active{display:flex}
+/* 统一橙色背景 + 圆点纹理 */
+.page::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.18) 1.5px,transparent 1.5px);background-size:22px 22px;pointer-events:none;z-index:0;opacity:.55}
+.page>*{position:relative;z-index:1}
+
+/* ====== PAGE 0: 开场 ====== */
+#page0{background:var(--bg-main);position:relative;overflow:hidden}
+.p0-stars{position:absolute;width:100%;height:100%;pointer-events:none}
+.p0-star{position:absolute;color:#FFF;font-size:28px;animation:twinkle 2s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+.p0-note{position:absolute;color:#FFF;font-size:40px;opacity:.5;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-25px) rotate(12deg)}}
+.p0-content{position:relative;z-index:10;text-align:center}
+.p0-title{font-size:clamp(48px,8vw,80px);font-weight:900;color:#FFF;text-shadow:4px 4px 0 #FF6B35,8px 8px 0 rgba(0,0,0,.1);letter-spacing:8px;animation:bounceIn .8s ease-out}
+@keyframes bounceIn{0%{transform:scale(0);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.p0-sub{font-size:clamp(18px,3vw,28px);color:#FFF;margin:15px 0 40px;opacity:0;animation:fadeUp .8s ease-out .4s forwards;text-shadow:2px 2px 4px rgba(0,0,0,.2)}
+.p0-sep{font-size:0.5em;vertical-align:middle;margin:0 0.15em;opacity:.85;font-weight:normal}
+@keyframes fadeUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.p0-nailong{width:clamp(180px,28vw,300px);height:clamp(220px,35vw,380px);margin:0 auto 30px;border-radius:25px;overflow:hidden;opacity:0;animation:fadeUp .8s ease-out .2s forwards}
+.p0-nailong img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.p0-bubble{background:#FFF;border-radius:30px;padding:20px 35px;max-width:clamp(300px,50vw,500px);margin:0 auto 35px;box-shadow:0 10px 30px rgba(0,0,0,.2);opacity:0;animation:fadeUp .8s ease-out .6s forwards;position:relative}
+.p0-bubble::after{content:'';position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);border:18px solid transparent;border-top-color:#FFF}
+.p0-bubble-text{font-size:clamp(22px,3.5vw,34px);font-weight:bold;color:#FF6B35;text-align:center}
+.p0-voice{display:inline-block;margin-right:8px;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.p0-btn{display:inline-block;padding:18px 55px;font-size:clamp(22px,3vw,30px);font-weight:bold;color:#FFF;background:linear-gradient(135deg,#FF6B35,#FF4E6E);border:none;border-radius:var(--radius-pill);cursor:pointer;box-shadow:0 10px 30px rgba(255,78,110,.4);transition:all .3s;opacity:0;animation:fadeUp .8s ease-out .8s forwards;letter-spacing:2px}
+.p0-btn:hover{transform:translateY(-5px) scale(1.05);box-shadow:0 18px 45px rgba(255,78,110,.55)}
+.p0-btn:active{transform:translateY(-2px) scale(1.02)}
+.p0-wave{position:absolute;bottom:0;left:0;width:100%;height:80px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='.15' d='M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'/%3E%3C/svg%3E") no-repeat bottom;background-size:cover}
+
+/* ====== PAGE 1: 摄像头+OK手势 ====== */
+#page1{background:var(--bg-deep)}
+.p1-header{text-align:center;margin-bottom:20px}
+.p1-header h2{font-size:clamp(28px,4vw,40px);color:#FFF;text-shadow:3px 3px 0 #FF4E6E,6px 6px 0 rgba(0,0,0,.1);font-weight:bold}
+.p1-header p{font-size:clamp(14px,2vw,20px);color:#FFF;margin-top:8px;opacity:.95;font-weight:bold}
+.p1-cam-wrap{position:relative;width:clamp(320px,50vw,560px);height:clamp(240px,37vw,420px);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-pop);background:#000;border:4px solid #FFF}
+.p1-cam-wrap video,.p1-cam-wrap canvas{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.p1-status{margin-top:20px;padding:15px 30px;border-radius:var(--radius-pill);font-size:clamp(18px,2.5vw,26px);font-weight:bold;text-align:center;transition:all .3s;backdrop-filter:blur(8px)}
+.p1-status.wait{background:rgba(255,255,255,.25);color:#FFF;border:2px solid rgba(255,255,255,.4)}
+.p1-status.ok{background:linear-gradient(135deg,#4CAF50,#2E7D32);color:#FFF;border:2px solid #FFF;box-shadow:0 8px 25px rgba(76,175,80,.5);animation:successPop .5s ease-out}
+@keyframes successPop{0%{transform:scale(.7)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+.p1-hand-icon{font-size:60px;margin-bottom:10px;animation:pulse 1s ease-in-out infinite;display:inline-block}
+
+/* ====== PAGE 1.5: 设置昵称+头像 ====== */
+#page1b{background:linear-gradient(135deg,#FFD93D 0%,#FF8C42 50%,#FF6B35 100%)}
+.p1b-title{font-size:clamp(32px,5vw,48px);color:#FFF;text-shadow:3px 3px 0 #FF4E6E,6px 6px 0 rgba(0,0,0,.1);margin-bottom:10px;letter-spacing:4px}
+.p1b-sub{font-size:clamp(16px,2.5vw,22px);color:rgba(255,255,255,.95);margin-bottom:clamp(20px,4vh,40px);font-weight:bold}
+.p1b-card{width:clamp(320px,50vw,480px);background:rgba(255,255,255,.95);border-radius:var(--radius-lg);padding:clamp(25px,4vw,40px);box-shadow:var(--shadow-pop);backdrop-filter:blur(8px)}
+.p1b-avatar-wrap{text-align:center;margin-bottom:25px}
+.p1b-avatar{display:inline-block;width:100px;height:100px;border-radius:50%;overflow:hidden;border:4px solid #FF6B35;background:#FFE08A;cursor:pointer;transition:all .3s;box-shadow:0 8px 20px rgba(255,107,53,.25)}
+.p1b-avatar:hover{transform:scale(1.08) rotate(-3deg);box-shadow:0 12px 28px rgba(255,107,53,.4)}
+.p1b-avatar img{width:100%;height:100%;object-fit:cover}
+.p1b-avatar-hint{font-size:14px;color:#666;margin-top:8px}
+.p1b-input-group{margin-bottom:20px}
+.p1b-input-group label{display:block;font-size:16px;color:#333;margin-bottom:8px;font-weight:bold}
+.p1b-input-group input{width:100%;padding:14px 18px;font-size:18px;border:2px solid #EEE;border-radius:15px;outline:none;transition:all .3s}
+.p1b-input-group input:focus{border-color:#FF6B35}
+.p1b-random-avatars{display:flex;gap:10px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
+.p1b-random-avatars img{width:50px;height:50px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .2s;object-fit:cover}
+.p1b-random-avatars img:hover{transform:scale(1.15)}
+.p1b-random-avatars img.selected{border-color:#FF6B35;transform:scale(1.15)}
+.p1b-btn{width:100%;padding:16px;font-size:20px;font-weight:bold;color:#FFF;background:linear-gradient(135deg,#FF8C42,#FF4E6E);border:none;border-radius:var(--radius-pill);cursor:pointer;transition:all .3s;box-shadow:var(--shadow-pop)}
+.p1b-btn:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 14px 35px rgba(255,78,110,.45)}
+.p1b-btn:disabled{background:#DDD;color:#999;cursor:not-allowed;box-shadow:none;transform:none}
+.p1b-duplicate{text-align:center;margin-top:15px;padding:15px;background:rgba(255,193,7,.15);border-radius:12px;display:none}
+.p1b-duplicate.show{display:block}
+.p1b-duplicate p{color:#333;font-size:14px;margin-bottom:10px}
+.p1b-duplicate .history-btn{padding:8px 20px;font-size:14px;color:#FF6B35;background:#FFF;border:2px solid #FF6B35;border-radius:20px;cursor:pointer;transition:all .3s}
+.p1b-duplicate .history-btn:hover{background:#FF6B35;color:#FFF}
+
+/* ====== PAGE 2: 历史记录 ====== */
+#page2h{background:var(--bg-soft)}
+.p2h-title{font-size:clamp(28px,4vw,40px);color:#FF6B35;margin-bottom:10px;text-shadow:2px 2px 0 rgba(255,255,255,.5)}
+.p2h-sub{font-size:clamp(14px,2vw,18px);color:rgba(123,52,30,.85);margin-bottom:clamp(15px,3vh,25px);font-weight:bold}
+.p2h-avatar{display:inline-block;width:60px;height:60px;border-radius:50%;overflow:hidden;border:4px solid #FFF;box-shadow:var(--shadow-card);margin-bottom:10px}
+.p2h-avatar img{width:100%;height:100%;object-fit:cover}
+.p2h-name{font-size:clamp(20px,3vw,28px);color:#7B341E;font-weight:bold;margin-bottom:5px}
+.p2h-table{width:clamp(300px,60vw,500px);max-height:clamp(200px,35vh,350px);overflow-y:auto;border-radius:var(--radius-md);background:rgba(255,255,255,.7);backdrop-filter:blur(10px);box-shadow:var(--shadow-card);margin-bottom:20px}
+.p2h-table::-webkit-scrollbar{width:6px}
+.p2h-table::-webkit-scrollbar-thumb{background:rgba(255,107,53,.4);border-radius:3px}
+.p2h-row{display:flex;align-items:center;padding:12px 20px;border-bottom:1px solid rgba(255,107,53,.1);color:#5D2914;font-size:clamp(14px,1.8vw,18px)}
+.p2h-row:last-child{border-bottom:none}
+.p2h-row-date{flex:1;color:#7B341E}
+.p2h-row-diff{padding:4px 12px;border-radius:var(--radius-pill);font-size:12px;margin-right:10px;font-weight:bold}
+.p2h-row-diff.easy{background:#C8E6C9;color:#2E7D32}
+.p2h-row-diff.hard{background:#FFCCBC;color:#D84315}
+.p2h-row-score{font-weight:bold;color:#FF6B35;font-size:clamp(18px,2.5vw,24px)}
+.p2h-btns{display:flex;gap:15px;flex-wrap:wrap;justify-content:center}
+.p2h-btn{padding:12px 30px;font-size:clamp(16px,2vw,20px);font-weight:bold;border:none;border-radius:var(--radius-pill);cursor:pointer;transition:all .3s}
+.p2h-btn:hover{transform:translateY(-3px)}
+.p2h-btn.primary{background:var(--bg-deep);color:#FFF;box-shadow:var(--shadow-pop)}
+.p2h-btn.secondary{background:rgba(255,255,255,.7);color:#FF6B35;border:2px solid #FF6B35}
+.p2h-empty{text-align:center;color:rgba(123,52,30,.6);padding:30px}
+
+/* ====== PAGE 2: 难度选择 ====== */
+#page2{background:var(--bg-main)}
+.p2-title{font-size:clamp(32px,5vw,48px);color:#FFF;text-shadow:3px 3px 0 #FF4E6E,6px 6px 0 rgba(0,0,0,.1);margin-bottom:clamp(20px,4vh,50px);letter-spacing:4px}
+.p2-user-info{display:flex;align-items:center;gap:15px;margin-bottom:25px;background:rgba(255,255,255,.25);padding:12px 25px;border-radius:var(--radius-pill);backdrop-filter:blur(8px);box-shadow:0 4px 15px rgba(0,0,0,.1)}
+.p2-user-info img{width:45px;height:45px;border-radius:50%;object-fit:cover;border:2px solid #FFF}
+.p2-user-info span{color:#FFF;font-size:clamp(16px,2.5vw,22px);font-weight:bold}
+.p2-cards{display:flex;gap:clamp(15px,3vw,40px);flex-wrap:wrap;justify-content:center}
+.p2-card{width:clamp(200px,28vw,280px);padding:clamp(20px,3vw,35px);border-radius:var(--radius-lg);background:rgba(255,255,255,.95);border:4px solid transparent;cursor:pointer;transition:all .35s cubic-bezier(.34,1.56,.64,1);text-align:center;box-shadow:var(--shadow-soft);backdrop-filter:blur(8px);position:relative;overflow:hidden}
+.p2-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,217,61,.4) 0%,transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+.p2-card:hover{transform:translateY(-15px) scale(1.03) rotate(-1deg);box-shadow:var(--shadow-pop);border-color:#FF4E6E}
+.p2-card:hover::before{opacity:1}
+.p2-card .icon{font-size:clamp(50px,7vw,70px);margin-bottom:10px;filter:drop-shadow(2px 4px 6px rgba(255,107,53,.3));animation:bobble 3s ease-in-out infinite}
+@keyframes bobble{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-8px) rotate(5deg)}}
+.p2-card h3{font-size:clamp(22px,3vw,30px);color:#5D2914;margin-bottom:8px}
+.p2-card p{font-size:clamp(14px,1.8vw,18px);color:#7B341E;opacity:.85}
+.p2-card .time{font-size:clamp(32px,5vw,48px);font-weight:bold;color:#FF4E6E;margin-top:12px;text-shadow:2px 2px 0 rgba(255,217,61,.5)}
+
+/* ====== PAGE 3: 运动界面 ====== */
+#page3{background:var(--bg-deep);flex-direction:row;padding:0}
+#page3::before{display:none}
+.p3-top{position:absolute;top:0;left:0;width:100%;height:60px;background:rgba(123,52,30,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:20;color:#FFF}
+.p3-timer{font-size:clamp(24px,3vw,36px);font-weight:bold;color:#FFE08A;text-shadow:2px 2px 0 #FF4E6E}
+.p3-score{font-size:clamp(20px,2.5vw,30px);font-weight:bold;color:#FFD93D}
+.p3-action-name{font-size:clamp(16px,2vw,24px);color:#FFF;text-align:center;font-weight:bold;text-shadow:1px 1px 2px rgba(0,0,0,.2)}
+.p3-progress{position:absolute;top:60px;left:0;width:100%;height:8px;background:rgba(255,255,255,.15);z-index:20}
+.p3-progress-fill{height:100%;background:linear-gradient(90deg,#FFD93D,#FF4E6E);transition:width .5s;width:0;border-radius:0 4px 4px 0}
+.p3-left{width:50%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(0,0,0,.1));overflow:hidden}
+.p3-left video{width:100%;height:100%;object-fit:contain;background:#000}
+.p3-left-fallback{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#FFF;padding:20px;font-weight:bold;text-shadow:1px 1px 2px rgba(0,0,0,.3);pointer-events:none}
+.p3-left-fallback .icon{font-size:clamp(60px,10vw,90px);margin-bottom:15px;animation:bounce 2s ease-in-out infinite}
+.p3-left-fallback .text{font-size:clamp(14px,2vw,18px);line-height:1.6;opacity:.95}
+.p3-left-fallback .text b{color:#FFE08A;font-size:clamp(16px,2.4vw,20px)}
+.p3-left-label{position:absolute;top:75px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FF6B35,#FF4E6E);color:#FFF;padding:6px 18px;border-radius:var(--radius-pill);font-size:clamp(12px,1.5vw,16px);font-weight:bold;z-index:5;box-shadow:var(--shadow-card)}
+.p3-right{width:50%;height:100%;position:relative;background:#000}
+.p3-right video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.p3-right canvas{position:absolute;top:0;left:0;width:100%;height:100%;transform:scaleX(-1)}
+.p3-right-label{position:absolute;top:75px;right:20px;background:linear-gradient(135deg,#4CAF50,#2E7D32);color:#FFF;padding:6px 18px;border-radius:var(--radius-pill);font-size:clamp(12px,1.5vw,16px);font-weight:bold;z-index:5;box-shadow:var(--shadow-card)}
+.p3-match{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);backdrop-filter:blur(8px);color:#FFF;padding:10px 25px;border-radius:var(--radius-pill);font-size:clamp(16px,2vw,22px);font-weight:bold;z-index:20;white-space:nowrap;border:2px solid rgba(255,255,255,.2)}
+.p3-match .star{color:#FFE08A}
+.p3-countdown{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:clamp(60px,10vw,120px);font-weight:900;color:#FFE08A;text-shadow:0 0 40px rgba(255,217,61,.7),3px 3px 0 #FF4E6E;z-index:30;display:none;animation:countPop .5s ease-out}
+@keyframes countPop{0%{transform:translate(-50%,-50%) scale(2);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.p3-beat{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);font-size:clamp(40px,6vw,70px);font-weight:900;color:#FFE08A;z-index:20;text-shadow:0 0 20px rgba(255,217,61,.5),2px 2px 0 #FF4E6E;animation:beatPop .3s ease-out}
+@keyframes beatPop{0%{transform:translateX(-50%) scale(1.5);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
+
+/* ====== PAGE 4: 排行榜 ====== */
+#page4{background:var(--bg-main)}
+.p4-title{font-size:clamp(36px,5vw,52px);color:#FFF;text-shadow:3px 3px 0 #FF4E6E,6px 6px 0 rgba(0,0,0,.1);margin-bottom:10px}
+.p4-sub{font-size:clamp(16px,2vw,22px);color:rgba(255,255,255,.95);margin-bottom:clamp(15px,3vh,30px);font-weight:bold;text-shadow:1px 1px 2px rgba(0,0,0,.15)}
+.p4-score-big{font-size:clamp(50px,8vw,80px);font-weight:900;color:#FFF;text-shadow:3px 3px 0 #FF4E6E;margin-bottom:5px}
+.p4-score-label{font-size:clamp(14px,2vw,18px);color:rgba(255,255,255,.9);margin-bottom:clamp(15px,3vh,25px);font-weight:bold}
+.p4-table{width:clamp(320px,70vw,600px);max-height:clamp(200px,35vh,350px);overflow-y:auto;border-radius:var(--radius-md);background:rgba(255,255,255,.85);backdrop-filter:blur(10px);box-shadow:var(--shadow-card);margin-bottom:clamp(15px,3vh,25px)}
+.p4-table::-webkit-scrollbar{width:6px}
+.p4-table::-webkit-scrollbar-thumb{background:rgba(255,107,53,.4);border-radius:3px}
+.p4-row{display:flex;align-items:center;padding:12px 15px;border-bottom:1px solid rgba(255,107,53,.1);color:#5D2914;font-size:clamp(13px,1.6vw,17px);transition:background .2s}
+.p4-row:hover{background:rgba(255,217,61,.15)}
+.p4-row:last-child{border-bottom:none}
+.p4-row.highlight{background:rgba(255,217,61,.35);border-left:4px solid #FF4E6E}
+.p4-rank{width:35px;font-weight:bold;color:#FF6B35;font-size:clamp(18px,2.2vw,22px)}
+.p4-avatar{width:36px;height:36px;border-radius:50%;overflow:hidden;margin-right:10px;flex-shrink:0;border:2px solid #FFF;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+.p4-avatar img{width:100%;height:100%;object-fit:cover}
+.p4-info{flex:1;min-width:0}
+.p4-name{font-weight:bold;color:#5D2914;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p4-meta{color:#7B341E;font-size:12px;opacity:.7}
+.p4-score{font-weight:bold;color:#FF4E6E;font-size:clamp(16px,2vw,22px);white-space:nowrap}
+.p4-btns{display:flex;gap:15px;flex-wrap:wrap;justify-content:center}
+.p4-btn{padding:14px 35px;font-size:clamp(16px,2vw,22px);font-weight:bold;border:none;border-radius:var(--radius-pill);cursor:pointer;transition:all .3s}
+.p4-btn:hover{transform:translateY(-3px) scale(1.03)}
+.p4-btn.primary{background:linear-gradient(135deg,#FF6B35,#FF4E6E);color:#FFF;box-shadow:var(--shadow-pop)}
+.p4-btn.secondary{background:rgba(255,255,255,.7);color:#FF6B35;border:2px solid #FF6B35}
+.p4-empty{text-align:center;color:rgba(255,255,255,.85);padding:30px;font-size:clamp(14px,2vw,18px);font-weight:bold}
+.p4-count{font-size:clamp(12px,1.5vw,16px);color:rgba(255,255,255,.95);margin-bottom:10px;font-weight:bold}
+
+/* ====== 数据管理 ====== */
+.p4-data{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:15px;padding:15px;background:rgba(255,255,255,.05);border-radius:15px}
+.p4-data-title{width:100%;font-size:clamp(13px,1.6vw,16px);color:rgba(255,255,255,.6);text-align:center;margin-bottom:5px}
+.p4-data-btn{padding:8px 18px;font-size:clamp(13px,1.5vw,15px);font-weight:bold;border:none;border-radius:20px;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:5px}
+.p4-data-btn:hover{transform:translateY(-2px)}
+.p4-data-btn.export{background:rgba(76,175,80,.25);color:#81C784;border:2px solid rgba(76,175,80,.4)}
+.p4-data-btn.export:hover{background:rgba(76,175,80,.4);color:#FFF}
+.p4-data-btn.import{background:rgba(33,150,243,.25);color:#64B5F6;border:2px solid rgba(33,150,243,.4)}
+.p4-data-btn.import:hover{background:rgba(33,150,243,.4);color:#FFF}
+.p4-data-btn.clear{background:rgba(244,67,54,.2);color:#E57373;border:2px solid rgba(244,67,54,.4)}
+.p4-data-btn.clear:hover{background:rgba(244,67,54,.4);color:#FFF}
+
+/* ====== 录制页样式 ====== */
+.rec-progress{
+  width:clamp(300px,60vw,520px);
+  height:14px;
+  background:rgba(255,255,255,.3);
+  border-radius:999px;
+  overflow:hidden;
+  margin-bottom:14px;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.15);
+}
+.rec-progress-fill{
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,#FFD93D,#FF4E6E);
+  border-radius:999px;
+  transition:width .15s linear;
+  box-shadow:0 0 12px rgba(255,217,61,.6);
+}
+.rec-time{
+  font-size:clamp(28px,4vw,44px);
+  font-weight:900;
+  color:#FFE08A;
+  text-shadow:3px 3px 0 #FF4E6E;
+  margin-bottom:12px;
+  font-variant-numeric:tabular-nums;
+}
+.rec-status{
+  font-size:clamp(14px,2vw,18px);
+  color:#fff;
+  font-weight:bold;
+  background:rgba(255,255,255,.18);
+  padding:10px 22px;
+  border-radius:999px;
+  margin-bottom:22px;
+  backdrop-filter:blur(6px);
+  border:2px solid rgba(255,255,255,.3);
+  min-height:24px;
+}
+.rec-status.recording{
+  background:linear-gradient(135deg,#FF4E6E,#FF6B35);
+  animation:pulseRec 1s ease-in-out infinite;
+}
+@keyframes pulseRec{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,78,110,.6)}
+  50%{box-shadow:0 0 0 16px rgba(255,78,110,0)}
+}
+.rec-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.rec-btn{
+  padding:14px 36px;
+  font-size:clamp(16px,2vw,20px);
+  font-weight:bold;
+  border:none;
+  border-radius:999px;
+  cursor:pointer;
+  transition:all .3s;
+  font-family:inherit;
+}
+.rec-btn.primary{
+  background:linear-gradient(135deg,#FF4E6E,#FF6B35);
+  color:#fff;
+  box-shadow:0 10px 26px rgba(255,78,110,.45);
+}
+.rec-btn.primary:hover{transform:translateY(-3px) scale(1.04)}
+.rec-btn.secondary{
+  background:rgba(255,255,255,.85);
+  color:#FF6B35;
+  border:2px solid #FF6B35;
+}
+.rec-btn.secondary:hover{background:#FF6B35;color:#fff}
+.rec-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.rec-info{
+  margin-top:18px;
+  padding:12px 20px;
+  background:rgba(255,255,255,.2);
+  border-radius:14px;
+  font-size:clamp(13px,1.6vw,15px);
+  color:#fff;
+  font-weight:bold;
+  backdrop-filter:blur(6px);
+  border:2px solid rgba(255,255,255,.3);
+}
+.rec-info b{color:var(--yellow)}
+.rec-io-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+  margin-top:12px;
+}
+.rec-io-btn{
+  padding:8px 18px;
+  font-size:clamp(13px,1.5vw,15px);
+  font-weight:bold;
+  border:none;
+  border-radius:999px;
+  cursor:pointer;
+  transition:all .3s;
+  font-family:inherit;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+.rec-io-btn:hover{transform:translateY(-2px)}
+.rec-io-btn.export{
+  background:rgba(76,175,80,.25);
+  color:#81C784;
+  border:2px solid rgba(76,175,80,.4);
+}
+.rec-io-btn.export:hover{background:rgba(76,175,80,.45);color:#fff}
+.rec-io-btn.import{
+  background:rgba(33,150,243,.25);
+  color:#64B5F6;
+  border:2px solid rgba(33,150,243,.4);
+}
+.rec-io-btn.import:hover{background:rgba(33,150,243,.45);color:#fff}
+.rec-io-btn.clear{
+  background:rgba(244,67,54,.2);
+  color:#E57373;
+  border:2px solid rgba(244,67,54,.4);
+}
+.rec-io-btn.clear:hover{background:rgba(244,67,54,.45);color:#fff}
+
+/* ====== Toast 提示 ====== */
+.toast{position:fixed;top:30px;left:50%;transform:translateX(-50%) translateY(-100px);padding:14px 28px;background:rgba(0,0,0,.85);color:#FFF;font-size:clamp(15px,2vw,17px);font-weight:bold;border-radius:30px;z-index:9999;opacity:0;transition:all .4s cubic-bezier(.68,-.55,.27,1.55);box-shadow:0 8px 25px rgba(0,0,0,.4);max-width:90%;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success{background:linear-gradient(135deg,#4CAF50,#2E7D32)}
+.toast.error{background:linear-gradient(135deg,#F44336,#C62828)}
+.toast.info{background:linear-gradient(135deg,#2196F3,#1565C0)}
+
+/* ====== 拖拽导入遮罩 ====== */
+.drop-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(26,26,46,.92);backdrop-filter:blur(8px);z-index:9998;display:none;align-items:center;justify-content:center;flex-direction:column;color:#FFF;pointer-events:none}
+.drop-overlay.show{display:flex;animation:fadeIn .3s ease-out}
+.drop-overlay .icon{font-size:clamp(80px,15vw,140px);margin-bottom:20px;animation:bounce 1s ease-in-out infinite}
+.drop-overlay .text{font-size:clamp(20px,4vw,32px);font-weight:bold;text-shadow:2px 2px 4px rgba(0,0,0,.3)}
+.drop-overlay .hint{font-size:clamp(14px,2.5vw,18px);color:rgba(255,255,255,.6);margin-top:15px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+
+/* ====== 启动恢复横幅 ====== */
+.restore-banner{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(150px);background:linear-gradient(135deg,#FF6B35,#FF8C42);color:#FFF;padding:14px 24px;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,.3);z-index:9997;display:flex;align-items:center;gap:12px;font-size:clamp(14px,1.8vw,16px);font-weight:bold;transition:transform .4s cubic-bezier(.68,-.55,.27,1.55);max-width:90%}
+.restore-banner.show{transform:translateX(-50%) translateY(0)}
+.restore-banner .info{flex:1}
+.restore-banner .info small{display:block;font-weight:normal;font-size:clamp(11px,1.3vw,13px);opacity:.85;margin-top:3px}
+.restore-banner button{padding:8px 18px;font-size:clamp(13px,1.5vw,15px);font-weight:bold;border:none;border-radius:20px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.restore-banner .yes{background:#FFF;color:#FF6B35}
+.restore-banner .yes:hover{transform:scale(1.05)}
+.restore-banner .no{background:rgba(0,0,0,.2);color:#FFF}
+.restore-banner .no:hover{background:rgba(0,0,0,.3)}
+</style>
+</head>
+<body>
+
+<!-- ====== PAGE 0: 开场 ====== -->
+<div class="page active" id="page0">
+<div class="p0-stars" id="p0Stars"></div>
+<div class="p0-content">
+<h1 class="p0-title">奶龙健身操 <span class="p0-sep">·</span> 久坐放松助手</h1>
+<div class="p0-nailong"><img src="nailong1.png" alt="奶龙"></div>
+<div class="p0-bubble">
+<span class="p0-voice">🔊</span>
+<span class="p0-bubble-text">我们一起来做健身操吧！</span>
+</div>
+<button class="p0-btn" onclick="goPage(1)">🚀 开始运动</button>
+</div>
+<div class="p0-wave"></div>
+</div>
+
+<!-- ====== PAGE 1: 摄像头+OK手势 ====== -->
+<div class="page" id="page1">
+<div class="p1-header">
+<h2>📷 请开启摄像头</h2>
+<p>对着摄像头比出 👌 OK手势 来确认</p>
+</div>
+<div class="p1-cam-wrap">
+<video id="v1" autoplay playsinline></video>
+<canvas id="c1"></canvas>
+</div>
+<div class="p1-status wait" id="okStatus">
+<div class="p1-hand-icon">👌</div>
+<div>等待摄像头开启...</div>
+</div>
+</div>
+
+<!-- ====== PAGE 1.5: 设置昵称+头像 ====== -->
+<div class="page" id="page1b">
+<h2 class="p1b-title">👤 设置你的资料</h2>
+<p class="p1b-sub">选择头像并输入昵称，用于排行榜展示</p>
+<div class="p1b-card">
+<div class="p1b-avatar-wrap">
+<div class="p1b-avatar" id="selectedAvatar">
+<img src="nailong1.png" alt="头像" id="avatarImg">
+</div>
+<p class="p1b-avatar-hint">点击下方选择头像</p>
+</div>
+<div class="p1b-random-avatars" id="randomAvatars"></div>
+<div class="p1b-input-group">
+<label>昵称</label>
+<input type="text" id="nicknameInput" placeholder="请输入昵称（2-10个字）" maxlength="10" oninput="checkNickname()">
+</div>
+<div class="p1b-duplicate" id="duplicateHint">
+<p>⚠️ 该昵称已存在，点击可查看历史记录</p>
+<button class="history-btn" onclick="viewHistory()">📜 查看历史记录</button>
+</div>
+<button class="p1b-btn" id="confirmBtn" onclick="confirmProfile()" disabled>✅ 确认并开始</button>
+</div>
+</div>
+
+<!-- ====== PAGE 2: 历史记录 ====== -->
+<div class="page" id="page2h">
+<div class="p2h-avatar"><img src="nailong1.png" alt="头像" id="histAvatar"></div>
+<div class="p2h-name" id="histName">--</div>
+<p class="p2h-sub">📜 历史得分记录</p>
+<div class="p2h-table" id="histTable"></div>
+<div class="p2h-btns">
+<button class="p2h-btn primary" onclick="goPage(2)">🎮 选择模式</button>
+<button class="p2h-btn secondary" onclick="goPage(1)">🔄 更换昵称</button>
+</div>
+</div>
+
+<!-- ====== PAGE 2: 模式选择 ====== -->
+<div class="page" id="page2">
+<h2 class="p2-title">🎯 选择模式</h2>
+<div class="p2-user-info" id="userInfoBar">
+<img src="nailong1.png" alt="头像" id="userInfoAvatar">
+<span id="userInfoName">游客</span>
+</div>
+<div class="p2-cards">
+<div class="p2-card" onclick="goPage('2r')">
+<div class="icon">🎬</div>
+<h3>录制我的舞蹈</h3>
+<p>录制一段舞步作为标准动作</p>
+<div class="time">25 秒</div>
+</div>
+<div class="p2-card" id="expCard" onclick="startExperience()">
+<div class="icon">🎮</div>
+<h3>体验模式</h3>
+<p id="expHint">跟随录制的舞蹈并打分</p>
+<div class="time" id="expTime">跟随 25s</div>
+</div>
+</div>
+<div id="recInfo" class="rec-info" style="display:none"></div>
+</div>
+
+<!-- ====== PAGE 2R: 录制舞蹈 ====== -->
+<div class="page" id="page2r">
+<h2 class="p2-title">🎬 录制我的舞蹈</h2>
+<p class="p1b-sub">面对摄像头，按节拍做你的舞步，系统会自动记录关键帧作为评分标准</p>
+<div class="p1-cam-wrap" style="margin-bottom:20px">
+<video id="vRec" autoplay playsinline muted></video>
+<canvas id="cRec"></canvas>
+</div>
+<div class="rec-progress"><div class="rec-progress-fill" id="recProgress"></div></div>
+<div class="rec-time" id="recTime">00 / 25 秒</div>
+<div class="rec-status" id="recStatus">💡 准备好后点击下方按钮开始录制</div>
+<div class="rec-btns">
+<button class="rec-btn primary" id="recStartBtn" onclick="toggleRecording()">🔴 开始录制</button>
+<button class="rec-btn secondary" onclick="cancelRecord()">↩️ 返回</button>
+</div>
+</div>
+
+<!-- ====== PAGE 3: 运动界面 ====== -->
+<div class="page" id="page3">
+<div class="p3-top">
+<div class="p3-timer" id="wTimer">01:00</div>
+<div class="p3-action-name" id="wActionName">准备开始...</div>
+<div class="p3-score" id="wScore">⭐ 0.00</div>
+</div>
+<div class="p3-progress"><div class="p3-progress-fill" id="wProgress"></div></div>
+<div class="p3-left">
+<video id="vNailong" autoplay loop muted playsinline preload="auto" onerror="this.style.display='none'">
+<source src="nailong_demo.mp4" type="video/mp4">
+</video>
+<div class="p3-left-fallback" id="nailongFallback">
+<div class="icon">📹</div>
+<div class="text">请将示范视频命名为<br><b>nailong_demo.mp4</b><br>并放在 HTML 同目录</div>
+</div>
+<div class="p3-left-label">🦖 奶龙领舞</div>
+</div>
+<div class="p3-right">
+<video id="v3" autoplay playsinline></video>
+<canvas id="c3"></canvas>
+<div class="p3-right-label">📷 你的动作</div>
+</div>
+<div class="p3-match" id="wMatch">匹配度: --</div>
+<div class="p3-countdown" id="wCountdown"></div>
+<div class="p3-beat" id="wBeat" style="display:none"></div>
+</div>
+
+<!-- ====== PAGE 4: 排行榜 ====== -->
+<div class="page" id="page4">
+<h2 class="p2h-title">🏆 运动完成！</h2>
+<div class="p2h-avatar" style="width:80px;height:80px;border-width:4px"><img src="nailong1.png" alt="头像" id="finalAvatar"></div>
+<div class="p4-score-big" id="finalScore">0.00</div>
+<div class="p4-score-label">本次得分 / 满分100</div>
+<div class="p4-count" id="rankCount"></div>
+<div class="p4-sub">📊 排行榜 TOP 1000</div>
+<div class="p4-table" id="rankTable"></div>
+<div class="p4-data">
+<div class="p4-data-title">💾 数据管理（备份到电脑）</div>
+<button class="p4-data-btn export" onclick="exportRanking()">📥 导出到电脑</button>
+<button class="p4-data-btn import" onclick="document.getElementById('importFile').click()">📤 从电脑导入</button>
+<button class="p4-data-btn clear" onclick="clearRanking()">🗑️ 清空排行榜</button>
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="importRanking(event)">
+</div>
+<div class="p4-btns">
+<button class="p4-btn primary" onclick="goPage(0)">🏠 返回首页</button>
+<button class="p4-btn secondary" onclick="goPage(2)">🔄 再来一次</button>
+</div>
+</div>
+
+<script>
+// ==================== 全局状态 ====================
+let currentPage = 0;
+let mpHands = null, mpPose = null;
+let camStream = null;
+let poseLandmarks = null;
+let workoutInterval = null, poseInterval = null, beatInterval = null;
+let totalSec = 60, remainSec = 60;
+let rawScore = 0, displayScore = 0, actionIdx = 0;
+let difficulty = 'easy';
+let actions = [];
+let userProfile = {name:'',avatar:'nailong1.png'};
+let beatCount = 0;
+// 录制舞蹈数据：{duration, keyframes:[{t, angles:{...}}]}
+let recordedDance = null;
+let isRecording = false;
+let recordStartTs = 0;
+let recordInterval = null;
+let recordKeyframes = [];
+const RECORD_TOTAL = 25; // 录制总时长（秒）
+const SAMPLE_HZ = 2;     // 每秒采样 2 个关键帧
+
+// ==================== 页面切换 ====================
+function goPage(n){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById('page'+n).classList.add('active');
+currentPage = n;
+if(n===1) initCamera();
+if(n==='1b') initProfilePage();
+if(n===2) refreshRecInfo();
+if(n==='2r') initRecordPage();
+if(n===3) startWorkout();
+if(n===4) showRanking();
+}
+
+// ==================== PAGE 0: 开场装饰 ====================
+(function initStars(){
+const c=document.getElementById('p0Stars');
+for(let i=0;i<12;i++){
+const s=document.createElement('span');
+s.className=i<8?'p0-star':'p0-note';
+s.textContent=i<8?(Math.random()>.5?'⭐':'✨'):(Math.random()>.5?'🎵':'🎶');
+s.style.top=Math.random()*85+5+'%';
+s.style.left=Math.random()*90+5+'%';
+s.style.animationDelay=Math.random()*2+'s';
+s.style.fontSize=(Math.random()*20+18)+'px';
+c.appendChild(s);
+}
+})();
+
+// ==================== PAGE 1: 摄像头 + OK手势 ====================
+async function initCamera(){
+const v=document.getElementById('v1');
+const c=document.getElementById('c1');
+const status=document.getElementById('okStatus');
+try{
+camStream=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'}});
+v.srcObject=camStream;
+await v.play();
+c.width=640;c.height=480;
+status.innerHTML='<div class="p1-hand-icon">👌</div><div>请对着摄像头比出 OK手势</div>';
+status.className='p1-status wait';
+mpHands=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+mpHands.setOptions({maxNumHands:1,modelComplexity:1,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
+mpHands.onResults(r=>{
+const ctx=c.getContext('2d');
+ctx.clearRect(0,0,c.width,c.height);
+if(r.multiHandLandmarks&&r.multiHandLandmarks.length){
+const lm=r.multiHandLandmarks[0];
+drawConnectors(ctx,lm,HAND_CONNECTIONS,{color:'#00FF00',lineWidth:2});
+drawLandmarks(ctx,lm,{color:'#FF0000',lineWidth:1,radius:3});
+if(isOKGesture(lm)){
+status.innerHTML='<div class="p1-hand-icon">✅</div><div>检测到OK手势！太棒了！</div>';
+status.className='p1-status ok';
+setTimeout(()=>goPage('1b'),1200);
+mpHands.close();mpHands=null;
+}
+}
+});
+detectHands(v);
+}catch(e){
+status.innerHTML='<div>摄像头开启失败，请检查权限</div>';
+status.className='p1-status wait';
+}
+}
+
+async function detectHands(v){
+if(!mpHands)return;
+if(v.readyState>=2)await mpHands.send({image:v});
+requestAnimationFrame(()=>detectHands(v));
+}
+
+function isOKGesture(lm){
+const dist=(a,b)=>Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2);
+const thumbIdx=dist(lm[4],lm[8])<0.06;
+const midUp=lm[12].y<lm[10].y;
+const ringUp=lm[16].y<lm[14].y;
+const pinkyUp=lm[20].y<lm[18].y;
+return thumbIdx&&midUp&&ringUp&&pinkyUp;
+}
+
+// ==================== 启动：加载录制的舞蹈 ====================
+(function loadRecordedDance(){
+try{
+  const raw = localStorage.getItem('nailong_recorded_dance');
+  if(raw){
+    const d = JSON.parse(raw);
+    if(d && d.keyframes && d.keyframes.length>0){
+      recordedDance = d;
+    }
+  }
+}catch(e){console.warn('加载录制数据失败',e);}
+})();
+
+// ==================== PAGE 1.5: 设置资料 ====================
+const AVATAR_POOL=['nailong1.png','nailong2.png','nailong3.png','nailong4.png'];
+
+function initProfilePage(){
+const container=document.getElementById('randomAvatars');
+container.innerHTML='';
+AVATAR_POOL.forEach((src,i)=>{
+const img=document.createElement('img');
+img.src=src;
+img.onclick=()=>selectAvatar(src,img);
+if(i===0){img.classList.add('selected');userProfile.avatar=src;}
+container.appendChild(img);
+});
+document.getElementById('nicknameInput').value='';
+document.getElementById('duplicateHint').classList.remove('show');
+checkNickname();
+}
+
+function selectAvatar(src,el){
+document.querySelectorAll('.p1b-random-avatars img').forEach(img=>img.classList.remove('selected'));
+el.classList.add('selected');
+document.getElementById('avatarImg').src=src;
+userProfile.avatar=src;
+}
+
+function checkNickname(){
+const input=document.getElementById('nicknameInput');
+const btn=document.getElementById('confirmBtn');
+const hint=document.getElementById('duplicateHint');
+const name=input.value.trim();
+if(name.length>=2&&name.length<=10){
+btn.disabled=false;
+const records=getAllRecords();
+const exists=records.some(r=>r.name===name);
+if(exists)hint.classList.add('show');
+else hint.classList.remove('show');
+}else{
+btn.disabled=true;
+hint.classList.remove('show');
+}
+}
+
+function confirmProfile(){
+const name=document.getElementById('nicknameInput').value.trim();
+if(name.length<2||name.length>10)return;
+userProfile.name=name;
+updateUserInfoBar();
+const records=getAllRecords();
+const exists=records.some(r=>r.name===name);
+if(exists)goPage('2h');
+else goPage(2);
+}
+
+function updateUserInfoBar(){
+document.getElementById('userInfoAvatar').src=userProfile.avatar;
+document.getElementById('userInfoName').textContent=userProfile.name||'游客';
+}
+
+// ==================== PAGE 2: 历史记录 ====================
+function viewHistory(){
+const name=document.getElementById('nicknameInput').value.trim();
+if(!name)return;
+userProfile.name=name;
+showHistoryPage(name);
+goPage('2h');
+}
+
+function showHistoryPage(name){
+document.getElementById('histName').textContent=name;
+const records=getAllRecords().filter(r=>r.name===name).sort((a,b)=>b.timestamp-a.timestamp);
+const table=document.getElementById('histTable');
+if(records.length===0){
+table.innerHTML='<div class="p2h-empty">暂无记录</div>';
+return;
+}
+let html='';
+records.forEach(r=>{
+html+=`<div class="p2h-row">
+<div class="p2h-row-date">${r.date}</div>
+<span class="p2h-row-diff ${r.difficulty==='简单'?'easy':'hard'}">${r.difficulty}</span>
+<div class="p2h-row-score">${r.score.toFixed(2)}</div>
+</div>`;
+});
+table.innerHTML=html;
+}
+
+// ==================== PAGE 2: 模式选择 ====================
+function refreshRecInfo(){
+  const info = document.getElementById('recInfo');
+  const hint = document.getElementById('expHint');
+  const time = document.getElementById('expTime');
+  if(recordedDance && recordedDance.keyframes && recordedDance.keyframes.length>0){
+    info.style.display = 'block';
+    info.innerHTML = `
+      <div>✅ 已录制 <b>${recordedDance.duration}</b> 秒舞蹈，<b>${recordedDance.keyframes.length}</b> 个关键帧可作为评分标准</div>
+      <div class="rec-io-row">
+        <button class="rec-io-btn export" onclick="exportRecordedDance()">📥 导出 JSON</button>
+        <button class="rec-io-btn import" onclick="document.getElementById('recImportFile').click()">📤 导入 JSON</button>
+        <button class="rec-io-btn clear" onclick="clearRecordedDance()">🗑️ 清空录制</button>
+        <input type="file" id="recImportFile" accept=".json,application/json" style="display:none" onchange="importRecordedDance(event)">
+      </div>`;
+    hint.textContent = '跟随你录制的舞蹈并打分';
+    time.textContent = `跟随 ${recordedDance.duration}s`;
+  } else {
+    info.style.display = 'block';
+    info.innerHTML = `
+      <div>⚠️ 还没有录制舞蹈，请先 <b>录制我的舞蹈</b> 再来体验～</div>
+      <div class="rec-io-row">
+        <button class="rec-io-btn import" onclick="document.getElementById('recImportFile').click()">📤 从电脑导入录制数据</button>
+        <input type="file" id="recImportFile" accept=".json,application/json" style="display:none" onchange="importRecordedDance(event)">
+      </div>`;
+    hint.textContent = '请先录制舞蹈';
+    time.textContent = '未录制';
+  }
+}
+
+function startExperience(){
+  if(!recordedDance || !recordedDance.keyframes || recordedDance.keyframes.length===0){
+    showToast('请先录制一段舞蹈～','error');
+    return;
+  }
+  difficulty = 'recorded';
+  totalSec = recordedDance.duration;
+  actions = recordedDance.keyframes.map((k,i)=>({name:`跟随关键帧 ${i+1}`, dur:1, pose:null, t:k.t, angles:k.angles}));
+  goPage(3);
+}
+
+// ==================== PAGE 2R: 录制舞蹈 ====================
+let recStream = null, recPose = null;
+
+async function initRecordPage(){
+  // 复位 UI
+  document.getElementById('recProgress').style.width = '0%';
+  document.getElementById('recTime').textContent = `00 / ${RECORD_TOTAL} 秒`;
+  document.getElementById('recStatus').className = 'rec-status';
+  document.getElementById('recStatus').textContent = '💡 准备好后点击下方按钮开始录制';
+  document.getElementById('recStartBtn').textContent = '🔴 开始录制';
+  document.getElementById('recStartBtn').disabled = false;
+
+  // 初始化摄像头
+  if(camStream){camStream.getTracks().forEach(t=>t.stop());}
+  const v = document.getElementById('vRec');
+  const c = document.getElementById('cRec');
+  try{
+    recStream = await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'}});
+    v.srcObject = recStream;
+    await v.play();
+    c.width = 640; c.height = 480;
+  }catch(e){
+    showToast('摄像头开启失败','error');
+    return;
+  }
+
+  // 初始化 MediaPipe Pose
+  recPose = new Pose({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}`});
+  recPose.setOptions({modelComplexity:1, smoothLandmarks:true, minDetectionConfidence:0.5, minTrackingConfidence:0.5});
+  recPose.onResults(r=>{
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    if(r.poseLandmarks){
+      poseLandmarks = r.poseLandmarks;
+      drawConnectors(ctx, r.poseLandmarks, POSE_CONNECTIONS, {color:'#00FF88', lineWidth:2});
+      drawLandmarks(ctx, r.poseLandmarks, {color:'#FF4444', lineWidth:1, radius:3});
+    }
+  });
+  detectRecPose(v);
+}
+
+async function detectRecPose(v){
+  if(!recPose) return;
+  if(v.readyState >= 2) await recPose.send({image:v});
+  requestAnimationFrame(()=>detectRecPose(v));
+}
+
+async function toggleRecording(){
+  if(!isRecording){
+    // 开始录制
+    isRecording = true;
+    recordKeyframes = [];
+    recordStartTs = Date.now();
+    document.getElementById('recStartBtn').textContent = '⏹️ 停止录制';
+    document.getElementById('recStatus').className = 'rec-status recording';
+    document.getElementById('recStatus').textContent = '🔴 录制中... 开始你的表演！';
+    const sampleMs = 1000 / SAMPLE_HZ;
+    recordInterval = setInterval(()=>{
+      const t = (Date.now() - recordStartTs) / 1000;
+      if(t >= RECORD_TOTAL){
+        finishRecording();
+        return;
+      }
+      // 采样当前姿态
+      if(poseLandmarks){
+        const angles = extractAngles(poseLandmarks);
+        recordKeyframes.push({t: +t.toFixed(2), angles});
+      }
+      // 更新 UI
+      const sec = Math.floor(t);
+      document.getElementById('recTime').textContent = `${String(sec).padStart(2,'0')} / ${RECORD_TOTAL} 秒`;
+      document.getElementById('recProgress').style.width = (t / RECORD_TOTAL * 100) + '%';
+    }, sampleMs);
+  } else {
+    finishRecording();
+  }
+}
+
+function finishRecording(){
+  isRecording = false;
+  clearInterval(recordInterval);
+  recordInterval = null;
+  if(recPose){recPose.close(); recPose = null;}
+  if(recStream){recStream.getTracks().forEach(t=>t.stop()); recStream = null;}
+  if(recordKeyframes.length < 4){
+    showToast('录制数据太少，请重新录制','error');
+    document.getElementById('recStartBtn').textContent = '🔴 重新录制';
+    document.getElementById('recStartBtn').disabled = false;
+    document.getElementById('recStatus').className = 'rec-status';
+    document.getElementById('recStatus').textContent = '⚠️ 录制数据不足，请重新录制';
+    return;
+  }
+  // 对齐到整数秒
+  const bySec = {};
+  recordKeyframes.forEach(k=>{
+    const s = Math.min(RECORD_TOTAL-1, Math.floor(k.t));
+    if(!bySec[s]) bySec[s] = {t:s, angles: k.angles, n:1};
+    else { bySec[s].n++; }
+  });
+  // 合并重复秒的采样
+  const merged = [];
+  for(let s=0; s<RECORD_TOTAL; s++){
+    if(bySec[s]){
+      // 多个采样取第一个即可（采样频率已够高）
+      merged.push(bySec[s]);
+    } else {
+      // 缺失秒用前后帧线性插值填充
+      const prev = merged[merged.length-1];
+      merged.push({t:s, angles: prev ? {...prev.angles} : {leftElbow:160,rightElbow:160,leftShoulder:90,rightShoulder:90,leftKnee:170,rightKnee:170,leftHip:170,rightHip:170}});
+    }
+  }
+  recordedDance = {duration: RECORD_TOTAL, keyframes: merged, recordedAt: Date.now()};
+  try{ localStorage.setItem('nailong_recorded_dance', JSON.stringify(recordedDance)); }catch(e){}
+  document.getElementById('recStartBtn').textContent = '✅ 已保存';
+  document.getElementById('recStartBtn').disabled = true;
+  document.getElementById('recStatus').className = 'rec-status';
+  document.getElementById('recStatus').innerHTML = `🎉 已录制 <b>${merged.length}</b> 个关键帧，体验者将跟随你的舞步打分`;
+  document.getElementById('recProgress').style.width = '100%';
+  showToast(`录制成功！共 ${merged.length} 帧`,'success');
+  setTimeout(()=>{ goPage(2); refreshRecInfo(); }, 1400);
+}
+
+function cancelRecord(){
+  if(isRecording){
+    isRecording = false;
+    clearInterval(recordInterval);
+    recordInterval = null;
+  }
+  if(recPose){recPose.close(); recPose = null;}
+  if(recStream){recStream.getTracks().forEach(t=>t.stop()); recStream = null;}
+  goPage(2);
+  refreshRecInfo();
+}
+
+// ==================== 录制数据：导出 / 导入 / 清空 ====================
+function exportRecordedDance(){
+  if(!recordedDance || !recordedDance.keyframes || recordedDance.keyframes.length===0){
+    showToast('暂无录制数据可导出','error');
+    return;
+  }
+  const data = {
+    app: '奶龙健身操',
+    type: 'recorded_dance',
+    version: 1,
+    duration: recordedDance.duration,
+    keyframes: recordedDance.keyframes,
+    recordedAt: recordedDance.recordedAt || Date.now(),
+    exportTime: new Date().toLocaleString('zh-CN'),
+    exportTimestamp: Date.now()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const ts = new Date();
+  const fname = `奶龙舞蹈_${ts.getFullYear()}${String(ts.getMonth()+1).padStart(2,'0')}${String(ts.getDate()).padStart(2,'0')}_${String(ts.getHours()).padStart(2,'0')}${String(ts.getMinutes()).padStart(2,'0')}.json`;
+  a.href = url;
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`已导出 ${recordedDance.keyframes.length} 个关键帧到电脑`,'success');
+}
+
+function importRecordedDance(e){
+  const file = e.target.files[0];
+  e.target.value = ''; // 允许重复导入同一文件
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(!data || !Array.isArray(data.keyframes) || data.keyframes.length===0){
+        showToast('文件格式错误：缺少 keyframes','error');
+        return;
+      }
+      // 校验每个关键帧的 angles 是否存在
+      const valid = data.keyframes.filter(k =>
+        k && typeof k.t === 'number' && k.angles && typeof k.angles === 'object'
+      );
+      if(valid.length === 0){
+        showToast('文件中没有有效的关键帧','error');
+        return;
+      }
+      recordedDance = {
+        duration: data.duration || valid.length,
+        keyframes: valid,
+        recordedAt: data.recordedAt || Date.now(),
+        importedAt: Date.now()
+      };
+      try{ localStorage.setItem('nailong_recorded_dance', JSON.stringify(recordedDance)); }catch(err){console.warn(err);}
+      showToast(`导入成功！共 ${valid.length} 帧`,'success');
+      refreshRecInfo();
+    }catch(err){
+      console.error(err);
+      showToast('文件解析失败：'+err.message,'error');
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function clearRecordedDance(){
+  if(!confirm('确定要清空录制的舞蹈数据吗？\n建议先导出备份！\n此操作不可恢复！')) return;
+  recordedDance = null;
+  try{ localStorage.removeItem('nailong_recorded_dance'); }catch(e){}
+  showToast('录制数据已清空','success');
+  refreshRecInfo();
+}
+
+// ==================== PAGE 3: 运动界面 ====================
+async function startWorkout(){
+if(camStream){camStream.getTracks().forEach(t=>t.stop());}
+remainSec=totalSec;rawScore=0;displayScore=0;actionIdx=0;beatCount=0;
+poseLandmarks=null;
+
+const v=document.getElementById('v3');
+const c=document.getElementById('c3');
+try{
+camStream=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'}});
+v.srcObject=camStream;
+await v.play();
+c.width=640;c.height=480;
+}catch(e){console.error(e);}
+
+initNailongVideo();
+
+mpPose=new Pose({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}`});
+mpPose.setOptions({modelComplexity:1,smoothLandmarks:true,minDetectionConfidence:0.5,minTrackingConfidence:0.5});
+mpPose.onResults(r=>{
+const ctx=c.getContext('2d');
+ctx.clearRect(0,0,c.width,c.height);
+if(r.poseLandmarks){
+poseLandmarks=r.poseLandmarks;
+drawConnectors(ctx,r.poseLandmarks,POSE_CONNECTIONS,{color:'#00FF88',lineWidth:2});
+drawLandmarks(ctx,r.poseLandmarks,{color:'#FF4444',lineWidth:1,radius:3});
+}
+});
+detectPose(v);
+
+await countdown(3);
+
+updateWorkoutUI();
+workoutInterval=setInterval(()=>{
+remainSec--;
+updateWorkoutUI();
+if(remainSec<=0)finishWorkout();
+},1000);
+
+poseInterval=setInterval(()=>{evaluatePose();},500);
+
+// 节拍 1 2 3 4
+beatInterval=setInterval(()=>{
+beatCount++;
+const beatNum=(beatCount%4)||4;
+showBeat(beatNum);
+},1000);
+}
+
+function countdown(n){
+return new Promise(resolve=>{
+const el=document.getElementById('wCountdown');
+el.style.display='block';
+let c=n;
+el.textContent=c;
+const iv=setInterval(()=>{
+c--;
+if(c<=0){clearInterval(iv);el.style.display='none';resolve();}
+else{el.textContent=c;el.style.animation='none';void el.offsetWidth;el.style.animation='countPop .5s ease-out';}
+},1000);
+});
+}
+
+function showBeat(n){
+const el=document.getElementById('wBeat');
+el.textContent=n;
+el.style.display='block';
+el.style.animation='none';
+void el.offsetWidth;
+el.style.animation='beatPop .3s ease-out';
+setTimeout(()=>el.style.display='none',300);
+}
+
+function updateWorkoutUI(){
+const m=Math.floor(remainSec/60),s=remainSec%60;
+document.getElementById('wTimer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+document.getElementById('wScore').textContent=`⭐ ${displayScore.toFixed(2)}`;
+const progress=((totalSec-remainSec)/totalSec)*100;
+document.getElementById('wProgress').style.width=progress+'%';
+// 体验模式：每帧 1 秒，当前 actionIdx = 已进行秒数
+actionIdx = Math.min(actions.length-1, totalSec - remainSec);
+const cur = actions[actionIdx];
+if(cur){
+  const sec = actionIdx + 1;
+  document.getElementById('wActionName').textContent = `第 ${sec} 秒 · 跟随关键帧 ${sec}`;
+}
+}
+
+// ==================== 奶龙领舞视频控制 ====================
+let nailongVideoEl=null;
+function initNailongVideo(){
+nailongVideoEl=document.getElementById('vNailong');
+const fb=document.getElementById('nailongFallback');
+if(!nailongVideoEl)return;
+// 视频加载成功 → 隐藏提示
+nailongVideoEl.addEventListener('loadeddata',()=>{if(fb)fb.style.display='none';},{once:true});
+// 视频加载失败 → 显示提示
+nailongVideoEl.addEventListener('error',()=>{if(fb)fb.style.display='flex';},{once:true});
+// 尝试静音自动播放（部分浏览器需要）
+nailongVideoEl.play().catch(()=>{});
+}
+
+// ==================== MediaPipe Pose ====================
+async function detectPose(v){
+if(!mpPose||currentPage!==3)return;
+if(v.readyState>=2)await mpPose.send({image:v});
+requestAnimationFrame(()=>detectPose(v));
+}
+
+// ==================== 姿态评分（满分100，使用录制的关键帧）====================
+function evaluatePose(){
+if(!poseLandmarks)return;
+const cur=actions[actionIdx];
+if(!cur)return;
+// 当前目标帧：体验模式下 actions[i].angles 即录制的关键帧角度
+const target = cur.angles || null;
+const match=calcMatch(poseLandmarks, target);
+const pts=match*0.5;
+rawScore+=pts;
+const maxPossible=totalSec*0.5;
+displayScore=Math.min(100,(rawScore/maxPossible)*100);
+document.getElementById('wScore').textContent=`⭐ ${displayScore.toFixed(2)}`;
+const stars=match>0.8?'⭐⭐⭐':match>0.5?'⭐⭐':'⭐';
+document.getElementById('wMatch').innerHTML=`匹配度: ${Math.round(match*100)}% ${stars}`;
+}
+
+function calcMatch(lm, target){
+const angles=extractAngles(lm);
+if(!target)return 0.5;
+let totalDiff=0,count=0;
+for(const k in target){
+if(angles[k]!==undefined){
+let diff=Math.abs(angles[k]-target[k]);
+if(diff>180)diff=360-diff;
+totalDiff+=diff;
+count++;
+}
+}
+if(count===0)return 0.5;
+const avgDiff=totalDiff/count;
+return Math.max(0,1-avgDiff/90);
+}
+
+function extractAngles(lm){
+const a=(p1,p2,p3)=>{
+const v1={x:lm[p1].x-lm[p2].x,y:lm[p1].y-lm[p2].y};
+const v2={x:lm[p3].x-lm[p2].x,y:lm[p3].y-lm[p2].y};
+const dot=v1.x*v2.x+v1.y*v2.y;
+const m1=Math.sqrt(v1.x**2+v1.y**2),m2=Math.sqrt(v2.x**2+v2.y**2);
+if(m1*m2===0)return 0;
+return Math.acos(Math.min(1,Math.max(-1,dot/(m1*m2))))*180/Math.PI;
+};
+return{
+leftElbow:a(11,13,15),rightElbow:a(12,14,16),
+leftShoulder:a(13,11,23),rightShoulder:a(14,12,24),
+leftKnee:a(23,25,27),rightKnee:a(24,26,28),
+leftHip:a(11,23,25),rightHip:a(12,24,26)
+};
+}
+
+// ==================== 完成运动 ====================
+function finishWorkout(){
+clearInterval(workoutInterval);
+clearInterval(poseInterval);
+clearInterval(beatInterval);
+if(mpPose){mpPose.close();mpPose=null;}
+if(nailongVideoEl){try{nailongVideoEl.pause();}catch(e){}}
+if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}
+saveScore(displayScore,difficulty);
+goPage(4);
+}
+
+// ==================== 数据存储（排行榜最多1000人）====================
+function getAllRecords(){
+return JSON.parse(localStorage.getItem('nailong_scores_v2')||'[]');
+}
+
+function saveScore(sc,diff){
+const records=getAllRecords();
+records.push({
+name:userProfile.name||'匿名',
+avatar:userProfile.avatar,
+score:Math.min(100,Math.max(0,sc)),
+difficulty:diff==='easy'?'简单':'困难',
+date:new Date().toLocaleString('zh-CN'),
+timestamp:Date.now()
+});
+// 按分数降序，保留前1000
+records.sort((a,b)=>b.score-a.score);
+if(records.length>1000)records.length=1000;
+localStorage.setItem('nailong_scores_v2',JSON.stringify(records));
+saveSnapshot(records);
+}
+
+// 写入最新快照（用于自动恢复）
+function saveSnapshot(records){
+try{
+localStorage.setItem('nailong_snapshot_v2',JSON.stringify({
+snapshotTime:Date.now(),
+records:records.slice(0,1000)
+}));
+}catch(e){console.warn('快照保存失败',e);}
+}
+
+// ==================== PAGE 4: 排行榜 ====================
+function showRanking(){
+const records=getAllRecords();
+document.getElementById('finalScore').textContent=displayScore.toFixed(2);
+document.getElementById('finalAvatar').src=userProfile.avatar;
+document.getElementById('rankCount').textContent=`当前排名人数: ${records.length} / 1000`;
+const table=document.getElementById('rankTable');
+if(records.length===0){
+table.innerHTML='<div class="p4-empty">暂无记录，快来创造第一个成绩吧！</div>';
+return;
+}
+let html='';
+records.forEach((r,i)=>{
+const isMe=r.name===userProfile.name&&Math.abs(r.score-displayScore)<0.01;
+const hl=isMe?' highlight':'';
+const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;
+html+=`<div class="p4-row${hl}">
+<div class="p4-rank">${medal}</div>
+<div class="p4-avatar"><img src="${r.avatar}" alt=""></div>
+<div class="p4-info">
+<div class="p4-name">${r.name}</div>
+<div class="p4-meta">${r.difficulty} · ${r.date}</div>
+</div>
+<div class="p4-score">${r.score.toFixed(2)}</div>
+</div>`;
+});
+table.innerHTML=html;
+setTimeout(()=>{
+const hlRow=table.querySelector('.highlight');
+if(hlRow)hlRow.scrollIntoView({behavior:'smooth',block:'center'});
+},300);
+}
+
+// ==================== 导出/导入/清空（保存到本地电脑）====================
+function showToast(msg,type='info'){
+let t=document.querySelector('.toast');
+if(!t){
+t=document.createElement('div');
+t.className='toast';
+document.body.appendChild(t);
+}
+t.className='toast '+type;
+t.textContent=msg;
+requestAnimationFrame(()=>t.classList.add('show'));
+clearTimeout(t._timer);
+t._timer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function exportRanking(){
+const records=getAllRecords();
+if(records.length===0){
+showToast('暂无数据可导出','error');
+return;
+}
+const data={
+app:'奶龙健身操',
+version:2,
+exportTime:new Date().toLocaleString('zh-CN'),
+exportTimestamp:Date.now(),
+count:records.length,
+records:records
+};
+const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+const ts=new Date();
+const fname=`奶龙排行榜_${ts.getFullYear()}${String(ts.getMonth()+1).padStart(2,'0')}${String(ts.getDate()).padStart(2,'0')}_${String(ts.getHours()).padStart(2,'0')}${String(ts.getMinutes()).padStart(2,'0')}.json`;
+a.href=url;
+a.download=fname;
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+showToast(`已导出 ${records.length} 条记录到电脑`,'success');
+}
+
+function importRanking(e){
+const file=e.target.files[0];
+e.target.value=''; // 重置以便能重复导入同一文件
+if(!file)return;
+const reader=new FileReader();
+reader.onload=(ev)=>{
+try{
+const data=JSON.parse(ev.target.result);
+if(!data.records||!Array.isArray(data.records)){
+showToast('文件格式错误','error');
+return;
+}
+// 验证每条记录的基本结构
+const validRecords=data.records.filter(r=>
+r&&typeof r.name==='string'&&typeof r.score==='number'&&typeof r.timestamp==='number'
+);
+if(validRecords.length===0){
+showToast('文件中没有有效记录','error');
+return;
+}
+const mode=confirm(
+`检测到 ${validRecords.length} 条有效记录\n\n`+
+`点击 "确定" = 合并到当前排行榜（去重）\n`+
+`点击 "取消" = 替换当前排行榜`
+);
+let current=getAllRecords();
+const beforeCount=current.length;
+if(mode){
+// 合并去重：按 name+timestamp+score 区分
+const key=r=>`${r.name}|${r.timestamp}|${r.score.toFixed(2)}`;
+const exist=new Set(current.map(key));
+let added=0;
+validRecords.forEach(r=>{if(!exist.has(key(r))){current.push(r);exist.add(key(r));added++;}});
+showToast(`合并完成，新增 ${added} 条记录`,'success');
+}else{
+current=validRecords;
+showToast(`已替换为 ${current.length} 条记录`,'success');
+}
+current.sort((a,b)=>b.score-a.score);
+if(current.length>1000)current.length=1000;
+localStorage.setItem('nailong_scores_v2',JSON.stringify(current));
+saveSnapshot(current);
+showRanking(); // 刷新排行榜显示
+}catch(err){
+console.error(err);
+showToast('文件解析失败：'+err.message,'error');
+}
+};
+reader.readAsText(file,'UTF-8');
+}
+
+function clearRanking(){
+if(!confirm('确定要清空所有排行榜数据吗？\n建议先导出备份！\n此操作不可恢复！'))return;
+if(!confirm('再次确认：真的要删除所有数据吗？'))return;
+localStorage.removeItem('nailong_scores_v2');
+showToast('排行榜已清空','success');
+showRanking();
+}
+</script>
+
+<!-- 拖拽导入遮罩 -->
+<div class="drop-overlay" id="dropOverlay">
+<div class="icon">📂</div>
+<div class="text">松开鼠标导入排行榜</div>
+<div class="hint">支持 .json 文件</div>
+</div>
+
+<!-- 启动恢复横幅 -->
+<div class="restore-banner" id="restoreBanner">
+<div class="info">
+📦 检测到本地备份数据
+<small id="restoreInfo">--</small>
+</div>
+<button class="yes" id="restoreYes">恢复</button>
+<button class="no" id="restoreNo">忽略</button>
+</div>
+
+<!-- 自动加载同目录备份（仅HTTP/HTTPS协议有效，file://会失败但不影响）-->
+<script>
+(async function autoLoadBackup(){
+// 1) 尝试读取同目录的 nailong_ranking_backup.json
+try{
+const res=await fetch('nailong_ranking_backup.json',{cache:'no-store'});
+if(res.ok){
+const data=await res.json();
+if(data&&Array.isArray(data.records)&&data.records.length>0){
+// 静默合并（不去重现有数据，只追加新的）
+const cur=getAllRecords();
+const key=r=>`${r.name}|${r.timestamp}|${r.score.toFixed(2)}`;
+const exist=new Set(cur.map(key));
+let added=0;
+data.records.forEach(r=>{
+if(r&&r.name&&typeof r.score==='number'&&typeof r.timestamp==='number'&&!exist.has(key(r))){
+cur.push(r);exist.add(key(r));added++;
+}
+});
+if(added>0){
+cur.sort((a,b)=>b.score-a.score);
+if(cur.length>1000)cur.length=1000;
+localStorage.setItem('nailong_scores_v2',JSON.stringify(cur));
+saveSnapshot(cur);
+showToast(`从同目录备份自动加载，新增 ${added} 条`,'success');
+}
+}
+}
+}catch(e){/* file:// 协议下 fetch 会失败，正常忽略 */}
+
+// 2) 提示恢复最近一次导出的快照
+const snapRaw=localStorage.getItem('nailong_snapshot_v2');
+if(snapRaw){
+try{
+const snap=JSON.parse(snapRaw);
+const cur=getAllRecords();
+const snapTime=new Date(snap.snapshotTime).toLocaleString('zh-CN');
+const curTime=cur.length>0?new Date(Math.max(...cur.map(r=>r.timestamp))).toLocaleString('zh-CN'):'空';
+// 仅当快照明显比当前数据更新时才提示
+if(snap.records&&snap.records.length>0&&snap.snapshotTime>0){
+document.getElementById('restoreInfo').textContent=
+`快照: ${snap.records.length} 条 (${snapTime}) / 当前: ${cur.length} 条 (${curTime})`;
+const banner=document.getElementById('restoreBanner');
+setTimeout(()=>banner.classList.add('show'),800);
+document.getElementById('restoreYes').onclick=()=>{
+const key=r=>`${r.name}|${r.timestamp}|${r.score.toFixed(2)}`;
+const exist=new Set(cur.map(key));
+let added=0;
+snap.records.forEach(r=>{if(!exist.has(key(r))){cur.push(r);exist.add(key(r));added++;}});
+cur.sort((a,b)=>b.score-a.score);
+if(cur.length>1000)cur.length=1000;
+localStorage.setItem('nailong_scores_v2',JSON.stringify(cur));
+saveSnapshot(cur);
+banner.classList.remove('show');
+showToast(`已从快照恢复，新增 ${added} 条`,'success');
+};
+document.getElementById('restoreNo').onclick=()=>{
+banner.classList.remove('show');
+};
+}
+}catch(e){console.error(e);}
+}
+})();
+
+// ==================== 拖拽导入 ====================
+(function setupDragDrop(){
+let dragCounter=0;
+const overlay=document.getElementById('dropOverlay');
+
+function isJsonFile(e){
+if(!e.dataTransfer)return false;
+const items=e.dataTransfer.items;
+if(items&&items.length>0){
+for(const it of items){
+if(it.kind==='file'&&(it.type==='application/json'||it.type===''))return true;
+}
+}
+return e.dataTransfer.files&&e.dataTransfer.files.length>0;
+}
+
+document.addEventListener('dragenter',e=>{
+if(!isJsonFile(e))return;
+e.preventDefault();
+dragCounter++;
+overlay.classList.add('show');
+});
+document.addEventListener('dragleave',e=>{
+e.preventDefault();
+dragCounter--;
+if(dragCounter<=0){dragCounter=0;overlay.classList.remove('show');}
+});
+document.addEventListener('dragover',e=>{e.preventDefault();});
+document.addEventListener('drop',e=>{
+e.preventDefault();
+dragCounter=0;
+overlay.classList.remove('show');
+const file=e.dataTransfer.files[0];
+if(!file)return;
+if(!file.name.toLowerCase().endsWith('.json')&&file.type!=='application/json'){
+showToast('只支持 .json 文件','error');
+return;
+}
+importRanking({target:{files:[file],value:''}});
+});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "app": "奶龙健身操",
+  "type": "recorded_dance",
+  "version": 2,
+  "easy": {
+    "duration": 25,
+    "recordedAt": 1717700000000,
+    "keyframes": [
+      { "t": 0,  "angles": { "leftElbow": 160, "rightElbow": 160, "leftShoulder": 90,  "rightShoulder": 90,  "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 1,  "angles": { "leftElbow": 158, "rightElbow": 162, "leftShoulder": 95,  "rightShoulder": 88,  "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 2,  "angles": { "leftElbow": 150, "rightElbow": 155, "leftShoulder": 110, "rightShoulder": 100, "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 3,  "angles": { "leftElbow": 145, "rightElbow": 148, "leftShoulder": 120, "rightShoulder": 115, "leftKnee": 168, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 4,  "angles": { "leftElbow": 140, "rightElbow": 142, "leftShoulder": 125, "rightShoulder": 120, "leftKnee": 168, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 5,  "angles": { "leftElbow": 130, "rightElbow": 135, "leftShoulder": 135, "rightShoulder": 130, "leftKnee": 168, "rightKnee": 168, "leftHip": 170, "rightHip": 170 } },
+      { "t": 6,  "angles": { "leftElbow": 120, "rightElbow": 125, "leftShoulder": 140, "rightShoulder": 135, "leftKnee": 168, "rightKnee": 168, "leftHip": 170, "rightHip": 170 } },
+      { "t": 7,  "angles": { "leftElbow": 110, "rightElbow": 115, "leftShoulder": 150, "rightShoulder": 145, "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 8,  "angles": { "leftElbow": 100, "rightElbow": 105, "leftShoulder": 155, "rightShoulder": 150, "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 9,  "angles": { "leftElbow": 90,  "rightElbow": 95,  "leftShoulder": 160, "rightShoulder": 155, "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 10, "angles": { "leftElbow": 95,  "rightElbow": 100, "leftShoulder": 158, "rightShoulder": 152, "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 11, "angles": { "leftElbow": 105, "rightElbow": 110, "leftShoulder": 150, "rightShoulder": 145, "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 12, "angles": { "leftElbow": 120, "rightElbow": 125, "leftShoulder": 140, "rightShoulder": 135, "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 13, "angles": { "leftElbow": 135, "rightElbow": 140, "leftShoulder": 125, "rightShoulder": 120, "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 14, "angles": { "leftElbow": 150, "rightElbow": 155, "leftShoulder": 110, "rightShoulder": 105, "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 15, "angles": { "leftElbow": 155, "rightElbow": 160, "leftShoulder": 100, "rightShoulder": 95,  "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 16, "angles": { "leftElbow": 160, "rightElbow": 160, "leftShoulder": 90,  "rightShoulder": 90,  "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 17, "angles": { "leftElbow": 155, "rightElbow": 155, "leftShoulder": 95,  "rightShoulder": 95,  "leftKnee": 168, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 18, "angles": { "leftElbow": 145, "rightElbow": 145, "leftShoulder": 110, "rightShoulder": 110, "leftKnee": 168, "rightKnee": 168, "leftHip": 170, "rightHip": 170 } },
+      { "t": 19, "angles": { "leftElbow": 130, "rightElbow": 130, "leftShoulder": 130, "rightShoulder": 130, "leftKnee": 168, "rightKnee": 168, "leftHip": 170, "rightHip": 170 } },
+      { "t": 20, "angles": { "leftElbow": 120, "rightElbow": 120, "leftShoulder": 140, "rightShoulder": 140, "leftKnee": 168, "rightKnee": 168, "leftHip": 170, "rightHip": 170 } },
+      { "t": 21, "angles": { "leftElbow": 130, "rightElbow": 130, "leftShoulder": 130, "rightShoulder": 130, "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 22, "angles": { "leftElbow": 140, "rightElbow": 140, "leftShoulder": 115, "rightShoulder": 115, "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 23, "angles": { "leftElbow": 150, "rightElbow": 150, "leftShoulder": 100, "rightShoulder": 100, "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } },
+      { "t": 24, "angles": { "leftElbow": 160, "rightElbow": 160, "leftShoulder": 90,  "rightShoulder": 90,  "leftKnee": 170, "rightKnee": 170, "leftHip": 170, "rightHip": 170 } }
+    ]
+  },
+  "hard": {
+    "duration": 78,
+    "recordedAt": 1717700000000,
+    "keyframes": []
+  }
+}
